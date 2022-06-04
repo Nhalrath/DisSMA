@@ -76,7 +76,7 @@ public class WordFilter extends ListenerAdapter {
             if (message.getContentDisplay().toLowerCase().contains(w)) {
                 String id = author.getId();
                 logger.info(
-                    "[%s - %s] %s",
+                    "[{} - {}] {}",
                     author.getEffectiveName(),
                     event.getChannel().getName(),
                     event.getMessage().getContentRaw());
