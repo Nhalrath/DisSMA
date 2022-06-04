@@ -1,0 +1,50 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
+}
+
+version '0.1.0'
+
+repositories {
+    jcenter()
+    mavenCentral()
+    maven {
+        name 'm2-dv8tion'
+        url 'https://m2.dv8tion.net/releases'
+    }
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    testImplementation 'junit:junit:4.13.2'
+    implementation 'com.google.guava:guava:30.1.1-jre'
+
+    implementation 'net.dv8tion:JDA:4.4.0_350'
+    implementation 'ch.qos.logback:logback-classic:1.2.6'
+}
+
+application {
+    mainClass = 'net.nhalrath.DisSMA.App'
+}
+
+jar {
+    archiveBaseName = project.name
+    manifest {
+        attributes 'Implementation-Version': archiveVersion
+        attributes 'Main-Class': application.mainClass
+    }
+}
+
+shadowJar {
+    archiveClassifier.set(null)
+}
+
+compileJava {
+    options.encoding 'UTF-8'
+}
+
+task stage() {
+    dependsOn shadowJar
+}
+
