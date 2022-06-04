@@ -102,9 +102,10 @@ public class WordFilter extends ListenerAdapter {
                         event.getGuild().getRoleById(App.getMutedRoleId())).queue();
                     channel.sendMessageFormat("%s has been muted.", event.getAuthor().getAsMention());
                 }
-            }
 
-            message.delete().queue();
+                message.delete().queue();
+                return;
+            }
         }
     }
 }
