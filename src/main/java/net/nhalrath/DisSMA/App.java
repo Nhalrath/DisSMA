@@ -53,6 +53,7 @@ public class App {
     private static String memeChannelId;
     private static String logChannelId;
     private static String mutedRoleId;
+    private static boolean strictMessageFilter;
 
     public static String getGuildId() { return guildId; }
     public static String getGeneralChannelId() { return generalChannelId; }
@@ -69,6 +70,8 @@ public class App {
         memeChannelId = System.getenv("CH_MEME");
         logChannelId = System.getenv("CH_LOG");
         mutedRoleId = System.getenv("RL_MUTE");
+        strictMessageFilter = Boolean.parseBoolean(System.getenv("OPT_STRICT_MSGFILTER"));
+
 
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("--token") || args[i].equals("-t")) {
@@ -95,6 +98,10 @@ public class App {
                 if (args[i + 1].startsWith("--") || args[i + 1].startsWith("-")) return;
                 mutedRoleId = args[++i];
             }
+            else if (args[i].equals("--opt-delmsg") || args[i].equals("-d")) {
+                if (args[i + 1].startsWith("--") || args[i + 1].startsWith("-")) return;
+                strictMessageFilter = Boolean.parseBoolean(args[++i]);
+            }
         }
 
         if (token == null ||
@@ -110,7 +117,7 @@ public class App {
             .enableIntents(GatewayIntent.GUILD_MEMBERS)
             .addEventListeners(
                 new ReadyEvent(),
-                new WordFilter(),
+                new WordFilter(strictMessageFilter),
                 new UtilityCommand());
 
         try {
