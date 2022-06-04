@@ -45,12 +45,12 @@ import net.nhalrath.DisSMA.App;
 public class WordFilter extends ListenerAdapter {
     private static final Logger logger = LoggerFactory.getLogger(WordFilter.class);
 
-    private HashMap<String, Integer> memberOffences;
+    private HashMap<String, Integer> memberOffenses;
     private List<String> badWords;
 
     public WordFilter() {
         badWords = new ArrayList<String>();
-        memberOffences = new HashMap<String, Integer>();
+        memberOffenses = new HashMap<String, Integer>();
 
         try {
             InputStream is = getClass().getClassLoader().getResourceAsStream("badwords.txt");
@@ -72,8 +72,8 @@ public class WordFilter extends ListenerAdapter {
 
         if (author.getUser() == event.getJDA().getSelfUser()) return;
 
-        for (String w : badWords) {
-            if (message.getContentDisplay().toLowerCase().contains(w)) {
+        for (String w : message.getContentDisplay().split(" ")) {
+            if (badWords.contains(w)) {
                 String id = author.getId();
                 logger.info(
                     "[{} - {}] {}",
@@ -81,22 +81,22 @@ public class WordFilter extends ListenerAdapter {
                     event.getChannel().getName(),
                     event.getMessage().getContentRaw());
 
-                if (memberOffences.containsKey(id)) {
-                    memberOffences.replace(id, memberOffences.get(id) + 1);
+                if (memberOffenses.containsKey(id)) {
+                    memberOffenses.replace(id, memberOffenses.get(id) + 1);
                 } else {
-                    memberOffences.put(id, 1);
+                    memberOffenses.put(id, 1);
                 }
 
-                int offenceCount = memberOffences.get(id);
+                int offenseCount = memberOffenses.get(id);
                 
-                if (offenceCount == 3) {
+                if (offenseCount == 3) {
                     channel.sendMessage("""
                         You've sent words that are banned from this channel more than 3 times already
                         during this session.
                         If you think that this is a mistake, please contact the admin.
                         """).queue();
                 }
-                else if (offenceCount >= 5) {
+                else if (offenseCount >= 5) {
                     event.getGuild().addRoleToMember(
                         id,
                         event.getGuild().getRoleById(App.getMutedRoleId())).queue();
