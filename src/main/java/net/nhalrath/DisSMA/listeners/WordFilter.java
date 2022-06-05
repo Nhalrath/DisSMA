@@ -47,12 +47,12 @@ public class WordFilter extends ListenerAdapter {
 
     private HashMap<String, Integer> memberOffenses;
     private List<String> badWords;
-    private boolean strictMessageFilter;
+    private boolean strictMode;
 
-    public WordFilter(boolean strictMessageFilter) {
+    public WordFilter(boolean enforceStrict) {
         this.badWords = new ArrayList<String>();
         this.memberOffenses = new HashMap<String, Integer>();
-        this.strictMessageFilter = strictMessageFilter;
+        this.strictMode = enforceStrict;
 
         try {
             InputStream is = getClass().getClassLoader().getResourceAsStream("badwords.txt");
@@ -83,6 +83,7 @@ public class WordFilter extends ListenerAdapter {
                     event.getChannel().getName(),
                     event.getMessage().getContentRaw());
 
+                if (!strictMode) return;
                 if (memberOffenses.containsKey(id)) {
                     memberOffenses.replace(id, memberOffenses.get(id) + 1);
                 } else {
@@ -99,14 +100,13 @@ public class WordFilter extends ListenerAdapter {
                         """).queue();
                 }
                 else if (offenseCount >= 5) {
-                    if (!strictMessageFilter) return;
                     event.getGuild().addRoleToMember(
                         id,
                         event.getGuild().getRoleById(App.getMutedRoleId())).queue();
                     channel.sendMessageFormat("%s has been muted.", event.getAuthor().getAsMention());
                 }
 
-                if (strictMessageFilter) message.delete().queue();
+                message.delete().queue();
                 return;
             }
         }
