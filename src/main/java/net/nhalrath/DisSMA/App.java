@@ -45,6 +45,7 @@ import net.nhalrath.DisSMA.listeners.WordFilter;
 public class App {
     private static final Logger logger = LoggerFactory.getLogger(App.class);
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private static String[] opts;
 
     private static JDA jda;
 
@@ -53,7 +54,7 @@ public class App {
     private static String memeChannelId;
     private static String logChannelId;
     private static String mutedRoleId;
-    private static boolean strictMessageFilter;
+    private static boolean enforceStrict = true;
 
     public static String getGuildId() { return guildId; }
     public static String getGeneralChannelId() { return generalChannelId; }
@@ -61,53 +62,36 @@ public class App {
     public static String getLogChannelId() { return logChannelId; }
     public static String getMutedRoleId() { return mutedRoleId; }
 
-    public static void main(String[] args) {
-        String token;
-
-        token = System.getenv("TOKEN");
-        guildId = System.getenv("GUILD");
-        generalChannelId = System.getenv("CH_GENERAL");
-        memeChannelId = System.getenv("CH_MEME");
-        logChannelId = System.getenv("CH_LOG");
-        mutedRoleId = System.getenv("RL_MUTE");
-        strictMessageFilter = Boolean.parseBoolean(System.getenv("OPT_STRICT_MSGFILTER"));
-
-
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("--token") || args[i].equals("-t")) {
-                if (args[i + 1].startsWith("--") || args[i + 1].startsWith("-")) return;
-                token = args[++i];
-            }
-            else if (args[i].equals("--guild") || args[i].equals("-s")) {
-                if (args[i + 1].startsWith("--") || args[i + 1].startsWith("-")) return;
-                guildId = args[++i];
-            }
-            else if (args[i].equals("--general-channel") || args[i].equals("-g")) {
-                if (args[i + 1].startsWith("--") || args[i + 1].startsWith("-")) return;
-                generalChannelId = args[++i];
-            }
-            else if (args[i].equals("--meme-channel") || args[i].equals("-m")) {
-                if (args[i + 1].startsWith("--") || args[i + 1].startsWith("-")) return;
-                memeChannelId = args[++i];
-            }
-            else if (args[i].equals("--log-channel") || args[i].equals("-l")) {
-                if (args[i + 1].startsWith("--") || args[i + 1].startsWith("-")) return;
-                logChannelId = args[++i];
-            }
-            else if (args[i].equals("--muted-role") || args[i].equals("-x")) {
-                if (args[i + 1].startsWith("--") || args[i + 1].startsWith("-")) return;
-                mutedRoleId = args[++i];
-            }
-            else if (args[i].equals("--opt-delmsg") || args[i].equals("-d")) {
-                if (args[i + 1].startsWith("--") || args[i + 1].startsWith("-")) return;
-                strictMessageFilter = Boolean.parseBoolean(args[++i]);
+    private static String getOption(String key, String longOpt, String shortOpt) {
+        for (int i = 0; i < opts.length; i++) {
+            if (opts[i].equals(longOpt) || opts[i].equals(shortOpt)) {
+                i++;
+                if (!(opts[i].startsWith("--") || opts[i].startsWith("-")))
+                    return opts[i];
             }
         }
+        return System.getenv(key) != null ? System.getenv(key) : null;
+    }
+
+    public static void main(String[] args) {
+        opts = args;
+        String token;
+
+        token = getOption("TOKEN", "--token", "-t");
+        guildId = getOption("GUILD", "--guild", "-s");
+        generalChannelId = getOption("CH_GENERAL", "--channel-general", "-g");
+        memeChannelId = getOption("CH_MEME", "-channel-meme", "-m");
+        logChannelId = getOption("CH_LOG", "--channel-logs", "-l");
+        mutedRoleId = getOption("RL_MUTE", "--role-mute", "-x");
+        enforceStrict =
+            Boolean.parseBoolean(getOption("OPT_ENFORCE_STRICT", "--enforce-strict", "-d"));
 
         if (token == null ||
             guildId == null ||
             generalChannelId == null ||
-            memeChannelId == null) {
+            memeChannelId == null ||
+            logChannelId == null ||
+            mutedRoleId == null) {
                 logger.error("One or more of the configuration variables are null");
                 System.exit(1);
         }
@@ -117,7 +101,7 @@ public class App {
             .enableIntents(GatewayIntent.GUILD_MEMBERS)
             .addEventListeners(
                 new ReadyEvent(),
-                new WordFilter(strictMessageFilter),
+                new WordFilter(enforceStrict),
                 new UtilityCommand());
 
         try {
@@ -141,6 +125,6 @@ public class App {
         scheduler.schedule(
             new Runnable() {
                 public void run() { logPosterHandle.cancel(false); }
-            }, 1, TimeUnit.DAYS);
+            }, 24, TimeUnit.HOURS);
     }
 }
