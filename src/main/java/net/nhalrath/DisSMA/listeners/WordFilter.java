@@ -79,8 +79,8 @@ public class WordFilter extends ListenerAdapter {
                 String id = author.getId();
                 logger.info(
                     "[{} - {}] {}",
-                    author.getEffectiveName(),
-                    event.getChannel().getName(),
+                    author.getAsMention(),
+                    event.getChannel().getAsMention(),
                     event.getMessage().getContentRaw());
 
                 if (!strictMode) return;
@@ -91,7 +91,6 @@ public class WordFilter extends ListenerAdapter {
                 }
 
                 int offenseCount = memberOffenses.get(id);
-                
                 if (offenseCount == 3) {
                     channel.sendMessage("""
                         You've sent words that are banned from this channel more than 3 times already
