@@ -46,7 +46,7 @@ public class MessageModifiedListener extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
         HashMap<String, String> message = new HashMap<String, String>();
-        message.put(event.getAuthor().getAsMention(), event.getMessage().getContentDisplay());
+        message.put(event.getAuthor().getId(), event.getMessage().getContentDisplay());
         messageCache.put(event.getMessageId(), message);
     }
 
