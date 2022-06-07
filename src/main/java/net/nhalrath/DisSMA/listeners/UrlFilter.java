@@ -37,7 +37,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.nhalrath.DisSMA.App;
 
 public class UrlFilter extends ListenerAdapter {
-    private static final Logger logger = LoggerFactory.getLogger(UrlFilter.class);
+    private final Logger logger = LoggerFactory.getLogger(UrlFilter.class);
 
     private HashMap<String, Integer> memberOffenses;
     private boolean strictMode;
@@ -62,8 +62,8 @@ public class UrlFilter extends ListenerAdapter {
                 String id = author.getId();
                 logger.info(
                     "[{} - {}] {}",
-                    author.getAsMention(),
-                    event.getChannel().getAsMention(),
+                    author.getId(),
+                    event.getChannel().getId(),
                     event.getMessage().getContentRaw());
 
                 if (!strictMode) return;

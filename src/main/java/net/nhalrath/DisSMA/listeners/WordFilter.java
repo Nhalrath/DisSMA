@@ -43,7 +43,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.nhalrath.DisSMA.App;
 
 public class WordFilter extends ListenerAdapter {
-    private static final Logger logger = LoggerFactory.getLogger(WordFilter.class);
+    private final Logger logger = LoggerFactory.getLogger(WordFilter.class);
 
     private HashMap<String, Integer> memberOffenses;
     private List<String> badWords;
@@ -79,8 +79,8 @@ public class WordFilter extends ListenerAdapter {
                 String id = author.getId();
                 logger.info(
                     "[{} - {}] {}",
-                    author.getAsMention(),
-                    event.getChannel().getAsMention(),
+                    author.getId(),
+                    event.getChannel().getId(),
                     event.getMessage().getContentRaw());
 
                 if (!strictMode) return;
