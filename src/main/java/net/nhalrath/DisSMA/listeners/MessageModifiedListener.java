@@ -54,17 +54,20 @@ public class MessageModifiedListener extends ListenerAdapter {
     public void onMessageUpdate(MessageUpdateEvent event) {
         Map<String, String> message = messageCache.get(event.getMessageId());
         String messageAuthor = message.keySet().toArray(new String[message.size()])[0];
-        String messageContent = message.get(messageAuthor);
+        String oldMessage = message.get(messageAuthor);
+        String newMessage = event.getMessage().getContentRaw();
 
         logger.info("""
                 [{} - {}] Message edited
                 Original:\t{}
-                Edited:\t{}
-                """,
+                Edited:\t{}""",
                 event.getAuthor().getId(),
                 event.getChannel().getId(),
-                messageContent,
-                event.getMessage().getContentRaw());
+                oldMessage,
+                newMessage);
+
+        message.replace(messageAuthor, newMessage);
+        messageCache.replace(event.getMessageId(), message);
     }
 
     @Override
@@ -72,13 +75,14 @@ public class MessageModifiedListener extends ListenerAdapter {
         Map<String, String> message = messageCache.get(event.getMessageId());
         String messageAuthor = message.keySet().toArray(new String[message.size()])[0];
         String messageContent = message.get(messageAuthor);
-        
+
         logger.info("""
                 [{} - {}] Message deleted
-                Content:\t{}
-                """,
+                Content:\t{}""",
                 messageAuthor,
                 event.getChannel().getId(),
                 messageContent);
+
+        messageCache.remove(event.getMessageId());
     }
 }
