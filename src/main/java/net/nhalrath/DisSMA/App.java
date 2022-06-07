@@ -39,7 +39,9 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.nhalrath.DisSMA.commands.UtilityCommand;
+import net.nhalrath.DisSMA.listeners.MessageModifiedListener;
 import net.nhalrath.DisSMA.listeners.ReadyEvent;
+import net.nhalrath.DisSMA.listeners.UrlFilter;
 import net.nhalrath.DisSMA.listeners.WordFilter;
 
 public class App {
@@ -102,6 +104,8 @@ public class App {
             .addEventListeners(
                 new ReadyEvent(),
                 new WordFilter(enforceStrict),
+                new UrlFilter(enforceStrict),
+                new MessageModifiedListener(),
                 new UtilityCommand());
 
         try {
