@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package net.nhalrath.DisSMA;
+package net.nhalrath.DiSMAL;
 
 import java.io.File;
 import java.util.concurrent.Executors;
@@ -38,11 +38,11 @@ import org.slf4j.LoggerFactory;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
-import net.nhalrath.DisSMA.commands.UtilityCommand;
-import net.nhalrath.DisSMA.listeners.MessageModifiedListener;
-import net.nhalrath.DisSMA.listeners.ReadyEvent;
-import net.nhalrath.DisSMA.listeners.UrlFilter;
-import net.nhalrath.DisSMA.listeners.WordFilter;
+import net.nhalrath.DiSMAL.commands.UtilityCommand;
+import net.nhalrath.DiSMAL.listeners.MessageModifiedListener;
+import net.nhalrath.DiSMAL.listeners.ReadyEvent;
+import net.nhalrath.DiSMAL.listeners.UrlFilter;
+import net.nhalrath.DiSMAL.listeners.WordFilter;
 
 public class App {
     private static final Logger logger = LoggerFactory.getLogger(App.class);

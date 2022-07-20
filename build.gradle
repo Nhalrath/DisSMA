@@ -49,7 +49,7 @@ dependencies {
 }
 
 application {
-    mainClass = 'net.nhalrath.DisSMA.App'
+    mainClass = 'net.nhalrath.DiSMAL.App'
 }
 
 jar {

@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package net.nhalrath.DisSMA.commands;
+package net.nhalrath.DiSMAL.commands;
 
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;

@@ -22,15 +22,9 @@
  * SOFTWARE.
  */
 
-package net.nhalrath.DisSMA.listeners;
+package net.nhalrath.DiSMAL.listeners;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,30 +34,17 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.nhalrath.DisSMA.App;
+import net.nhalrath.DiSMAL.App;
 
-public class WordFilter extends ListenerAdapter {
-    private final Logger logger = LoggerFactory.getLogger(WordFilter.class);
+public class UrlFilter extends ListenerAdapter {
+    private final Logger logger = LoggerFactory.getLogger(UrlFilter.class);
 
     private HashMap<String, Integer> memberOffenses;
-    private List<String> badWords;
     private boolean strictMode;
 
-    public WordFilter(boolean enforceStrict) {
-        this.badWords = new ArrayList<String>();
+    public UrlFilter(boolean enforceStrict) {
         this.memberOffenses = new HashMap<String, Integer>();
         this.strictMode = enforceStrict;
-
-        try {
-            InputStream is = getClass().getClassLoader().getResourceAsStream("badwords.txt");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                badWords.add(line);
-            }
-        } catch (IOException e) {
-            logger.error("Failed to read badwords.txt");
-        }
     }
 
     @Override
@@ -71,11 +52,13 @@ public class WordFilter extends ListenerAdapter {
         Member author = event.getMember();
         TextChannel channel = event.getChannel();
         Message message = event.getMessage();
+        String[] potentiallyDangerousUrlProtocols = { "http://", "ws://" };
 
         if (author.getUser() == event.getJDA().getSelfUser()) return;
-
-        for (String w : message.getContentDisplay().split(" ")) {
-            if (badWords.contains(w)) {
+        
+        for (String s : potentiallyDangerousUrlProtocols) {
+            // We could use regex instead for more accurate match.
+            if (message.getContentDisplay().toLowerCase().contains(s)) {
                 String id = author.getId();
                 logger.info(
                     "[{} - {}] {}",
@@ -90,10 +73,13 @@ public class WordFilter extends ListenerAdapter {
                     memberOffenses.put(id, 1);
                 }
 
+                if (!strictMode) return;
+                message.reply("Hold on right there! That's is a potentially dangerous link.");
+
                 int offenseCount = memberOffenses.get(id);
                 if (offenseCount == 3) {
                     channel.sendMessage("""
-                        You've sent words that are banned from this channel more than 3 times already
+                        You've sent potentially dangerous link this channel more than 3 times already
                         during this session.
                         If you think that this is a mistake, please contact the admin.
                         """).queue();
@@ -104,10 +90,8 @@ public class WordFilter extends ListenerAdapter {
                         event.getGuild().getRoleById(App.getMutedRoleId())).queue();
                     channel.sendMessageFormat("%s has been muted.", event.getAuthor().getAsMention());
                 }
-
-                message.delete().queue();
-                return;
             }
         }
     }
 }
+ 
